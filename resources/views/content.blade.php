@@ -22,6 +22,10 @@
         <a href="/" class="navbar-logo">BANK</a>
         <ul class="navbar-links">
             @auth
+
+                <li><a href="/advisor/clients">Clients </a></li>
+                <li><a href="/advisor/reports">Reports </a></li>
+
                 <li class="logout"><a href="/logout">Logout </a></li>
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {

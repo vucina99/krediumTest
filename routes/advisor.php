@@ -8,6 +8,9 @@ Route::pattern('id', '^\d+$'); //proveravamo da li je svaki prosledjeni id integ
 Route::group(['prefix' => 'advisor', 'middleware' => 'auth'], function () {
 
     Route::get('/home', [AdvisorController::class , 'home']);
+    Route::get('/clients', [AdvisorController::class , 'clients']);
+    Route::get('/create/client', [AdvisorController::class , 'createClient']);
+    Route::post('/create/client/system', [AdvisorController::class , 'createClientSystem']);
 
     Route::post('/logout', [AdvisorController::class , 'logout']);
 
