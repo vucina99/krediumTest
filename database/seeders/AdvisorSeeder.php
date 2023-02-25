@@ -16,7 +16,7 @@ class AdvisorSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('advisors')->insert([
+        DB::table('users')->insert([
             'first_name' => 'Vuk',
             'last_name' => 'Zdravkovic',
             'email' => 'vukzdravkovic71@gmail.com',
