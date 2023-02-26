@@ -8,6 +8,9 @@ Route::pattern('id', '^\d+$'); //proveravamo da li je svaki prosledjeni id integ
 Route::group(['prefix' => 'advisor', 'middleware' => 'auth'], function () {
 
     Route::get('/home', [AdvisorController::class , 'home']);
+
+
+    //clients
     Route::get('/clients', [AdvisorController::class , 'clients']);
     Route::get('/create/client', [AdvisorController::class , 'createClient']);
     Route::post('/create/client', [AdvisorController::class , 'createClientSystem']);
@@ -17,6 +20,12 @@ Route::group(['prefix' => 'advisor', 'middleware' => 'auth'], function () {
     Route::patch('/cash/loan/{id}', [AdvisorController::class , 'cashLoan']);
     Route::patch('/home/loan/{id}', [AdvisorController::class , 'homeLoan']);
 
+    //reports
+    Route::get('/reports', [AdvisorController::class , 'reports']);
+
+
+
+//    logout
     Route::post('/logout', [AdvisorController::class , 'logout']);
 
 });

@@ -60,8 +60,11 @@ class AdvisorController extends Controller
         if(!$client){
             return redirect('/advisor/clients');
         }
-        Session::flash('success', 'The client was successfully deleted.');
+        $client->cashLoan()->delete();
+        $client->homeLoan()->delete();
         $client->delete();
+        Session::flash('success', 'The client was successfully deleted.');
+
 
         return redirect('/advisor/clients');
     }
@@ -105,9 +108,12 @@ class AdvisorController extends Controller
                 'loan_amount' => $request->loan_amount
             ]);
         }else{
-            $cashLoan->loan_amount = $request->loan_amount;
-            $cashLoan->advisor_id = Auth::user()->id;
-            $cashLoan->save();
+            if($cashLoan->advisor_id == Auth::user()->id){
+                $cashLoan->loan_amount = $request->loan_amount;
+                $cashLoan->save();
+            }else{
+                return redirect('/advisor/clients');
+            }
         }
 
         $request->session()->flash('success', 'New cash loan has been added successfully.');
@@ -131,13 +137,29 @@ class AdvisorController extends Controller
                 'property_value' => $request->property_value
             ]);
         }else{
-            $cashLoan->down_payment_amount = $request->down_payment_amount;
-            $cashLoan->property_value = $request->property_value;
-            $cashLoan->advisor_id = Auth::user()->id;
-            $cashLoan->save();
+            if($cashLoan->advisor_id == Auth::user()->id){
+                $cashLoan->down_payment_amount = $request->down_payment_amount;
+                $cashLoan->property_value = $request->property_value;
+                $cashLoan->save();
+            }else{
+                return redirect('/advisor/clients');
+            }
+
         }
 
         $request->session()->flash('success', 'New home loan has been added successfully.');
         return back();
+    }
+
+    public function reports(){
+        $cahsLoan = CashLoan::select('loan_amount',  DB::raw('null as down_payment_amount') ,  'created_at', 'advisor_id')
+            ->addSelect(DB::raw("'cash loan' as type"))
+            ->where('advisor_id', Auth::user()->id);
+        $homeLoan = HomeLoan::select('property_value', 'down_payment_amount', 'created_at', 'advisor_id')
+            ->addSelect(DB::raw("'home loan' as type"))
+            ->where('advisor_id', Auth::user()->id);
+        $reports = $cahsLoan->union($homeLoan)->orderBy('created_at', 'desc')->get();
+
+        return view('advisor.auth.reports' , compact('reports'));
     }
 }
