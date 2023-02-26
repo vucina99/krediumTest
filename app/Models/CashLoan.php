@@ -10,7 +10,7 @@ class CashLoan extends Model
     use HasFactory;
     protected $fillable = [
         'client_id',
-        'advisor_id' ,
+        'user_id' ,
         'loan_amount'
     ];
 }

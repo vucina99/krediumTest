@@ -17,8 +17,8 @@ class CreateHomeLoansTable extends Migration
             $table->id();
             $table->unsignedBigInteger('client_id');
             $table->foreign('client_id')->references('id')->on('clients') ;
-            $table->unsignedBigInteger('advisor_id');
-            $table->foreign('advisor_id')->references('id')->on('advisors') ;
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users') ;
             $table->integer('down_payment_amount');
             $table->integer('property_value');
             $table->timestamps();

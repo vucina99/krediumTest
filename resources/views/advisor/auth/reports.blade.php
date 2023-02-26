@@ -10,7 +10,11 @@
                     <div class="goback">
                         <a href="/"> GO BACK </a>
                     </div>
-
+                    @if(count($reports) > 0)
+                    <div class="create">
+                        <a href="/advisor/export/excel"> EXPORT EXCEL</a>
+                    </div>
+                    @endif
                 </div>
             </div>
             <br>

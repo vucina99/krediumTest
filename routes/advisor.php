@@ -22,6 +22,7 @@ Route::group(['prefix' => 'advisor', 'middleware' => 'auth'], function () {
 
     //reports
     Route::get('/reports', [AdvisorController::class , 'reports']);
+    Route::get('/export/excel', [AdvisorController::class , 'exportToXlsx']);
 
 
 

@@ -11,7 +11,7 @@ class HomeLoan extends Model
 
     protected $fillable = [
         'client_id',
-        'advisor_id' ,
+        'user_id' ,
         'down_payment_amount' ,
         'property_value',
     ];

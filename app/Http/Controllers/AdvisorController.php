@@ -13,6 +13,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use PHPExcel;
+use PHPExcel_IOFactory;
+use PHPExcel_Style_Alignment;
+
 
 class AdvisorController extends Controller
 {
@@ -104,11 +108,11 @@ class AdvisorController extends Controller
         if(!$cashLoan){
             CashLoan::create([
                 'client_id' => $id,
-                'advisor_id' => Auth::user()->id,
+                'user_id' => Auth::user()->id,
                 'loan_amount' => $request->loan_amount
             ]);
         }else{
-            if($cashLoan->advisor_id == Auth::user()->id){
+            if($cashLoan->user_id == Auth::user()->id){
                 $cashLoan->loan_amount = $request->loan_amount;
                 $cashLoan->save();
             }else{
@@ -132,12 +136,12 @@ class AdvisorController extends Controller
         if(!$cashLoan){
             HomeLoan::create([
                 'client_id' => $id,
-                'advisor_id' => Auth::user()->id,
+                'user_id' => Auth::user()->id,
                 'down_payment_amount' => $request->down_payment_amount,
                 'property_value' => $request->property_value
             ]);
         }else{
-            if($cashLoan->advisor_id == Auth::user()->id){
+            if($cashLoan->user_id == Auth::user()->id){
                 $cashLoan->down_payment_amount = $request->down_payment_amount;
                 $cashLoan->property_value = $request->property_value;
                 $cashLoan->save();
@@ -152,14 +156,87 @@ class AdvisorController extends Controller
     }
 
     public function reports(){
-        $cahsLoan = CashLoan::select('loan_amount',  DB::raw('null as down_payment_amount') ,  'created_at', 'advisor_id')
+        $cahsLoan = CashLoan::select('loan_amount',  DB::raw('null as down_payment_amount') ,  'created_at', 'user_id')
             ->addSelect(DB::raw("'cash loan' as type"))
-            ->where('advisor_id', Auth::user()->id);
-        $homeLoan = HomeLoan::select('property_value', 'down_payment_amount', 'created_at', 'advisor_id')
+            ->where('user_id', Auth::user()->id);
+        $homeLoan = HomeLoan::select('property_value', 'down_payment_amount', 'created_at', 'user_id')
             ->addSelect(DB::raw("'home loan' as type"))
-            ->where('advisor_id', Auth::user()->id);
+            ->where('user_id', Auth::user()->id);
         $reports = $cahsLoan->union($homeLoan)->orderBy('created_at', 'desc')->get();
 
         return view('advisor.auth.reports' , compact('reports'));
+    }
+
+
+
+
+
+    function exportToXlsx() {
+
+        $cahsLoan = CashLoan::select('loan_amount',  DB::raw('null as down_payment_amount') ,  'created_at', 'user_id')
+            ->addSelect(DB::raw("'cash loan' as type"))
+            ->where('user_id', Auth::user()->id);
+        $homeLoan = HomeLoan::select('property_value', 'down_payment_amount', 'created_at', 'user_id')
+            ->addSelect(DB::raw("'home loan' as type"))
+            ->where('user_id', Auth::user()->id);
+        $data = $cahsLoan->union($homeLoan)->orderBy('created_at', 'desc')->get();
+
+
+
+        // Create new PHPExcel object
+        $objPHPExcel = new PHPExcel();
+
+        // Set document properties
+        $objPHPExcel->getProperties()->setCreator("Your Name")
+            ->setLastModifiedBy("Your Name")
+            ->setTitle("Product Report")
+            ->setSubject("Product Report")
+            ->setDescription("Product Report")
+            ->setKeywords("Product, Report")
+            ->setCategory("Product");
+
+        // Add data to worksheet
+        $objPHPExcel->setActiveSheetIndex(0)
+            ->setCellValue('A1', 'Product Type')
+            ->setCellValue('B1', 'Product Value')
+            ->setCellValue('C1', 'Creation date');
+        $row = 2;
+        foreach ($data as $value) {
+            if($value->type == 'cash loan'){
+                $objPHPExcel->setActiveSheetIndex(0)
+                    ->setCellValue('A'.$row, $value->type)
+                    ->setCellValue('B'.$row, (string) $value->loan_amount)
+                    ->setCellValue('C'.$row, $value->created_at->format('Y-m-d H:i:s'));
+            }else{
+                $objPHPExcel->setActiveSheetIndex(0)
+                    ->setCellValue('A'.$row, $value->type)
+                    ->setCellValue('B'.$row, $value->loan_amount.' - ' .$value->down_payment_amount )
+                    ->setCellValue('C'.$row, $value->created_at->format('Y-m-d H:i:s'));
+            }
+
+            $row++;
+        }
+
+        // Style worksheet
+        $objPHPExcel->getActiveSheet()->getStyle('A1:C1')->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle('A1:C1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('A')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setAutoSize(true);
+
+        // Rename worksheet
+        $objPHPExcel->getActiveSheet()->setTitle('Product Report');
+
+        // Create writer
+        $writer = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+
+        // Set headers
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="product_report.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        // Write file to output stream
+        $writer->save('php://output');
+
     }
 }
