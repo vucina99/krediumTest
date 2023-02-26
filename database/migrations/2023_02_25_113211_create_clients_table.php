@@ -17,8 +17,9 @@ class CreateClientsTable extends Migration
             $table->id();
             $table->string("first_name");
             $table->string("last_name");
-            $table->string("email")->nullable()->unique();
-            $table->string("phone_number")->nullable()->unique();
+            //pretpostavljam da treba da budu unique email i phone number ali s obzirom da ne pise nisam ni ja stavio
+            $table->string("email")->nullable();
+            $table->string("phone_number")->nullable();
             $table->timestamps();
         });
     }

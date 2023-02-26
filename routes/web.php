@@ -17,5 +17,5 @@ Route::get('/', function () {
     return view('index');
 });
 
-Route::get('/login', [GuestController::class , 'login']);
+Route::get('/login', [GuestController::class , 'login'])->name('login');
 Route::post('/login', [GuestController::class , 'loginSystem']);

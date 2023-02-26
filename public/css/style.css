@@ -112,7 +112,8 @@ label {
 
 input[type="email"],
 input[type="password"],
-input[type="text"]{
+input[type="text"],
+input[type="number"]{
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
@@ -223,4 +224,8 @@ button[type="submit"] {
     color: #333333;
     text-decoration: none;
     width: 100%;
+}
+.deleteButton{
+    padding: 0px;
+    margin: 0px;
 }

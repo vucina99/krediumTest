@@ -16,15 +16,22 @@ class Client extends Model
         'phone',
     ];
 
-    public function create($request){
-
-        $client =  Client::create([
-            'first_name' => $request['first_name'],
-            'last_name' => $request['last_name'],
-            'email' => $request['email'],
-            'phone' => $request['phone'],
-        ]);
-
-        return $client->refresh();
+    public function homeLoan(){
+       return $this->hasOne(HomeLoan::class);
     }
+
+    public function cashLoan(){
+        return $this->hasOne(CashLoan::class);
+    }
+//    public function create($request){
+//
+//        $client =  Client::create([
+//            'first_name' => $request['first_name'],
+//            'last_name' => $request['last_name'],
+//            'email' => $request['email'],
+//            'phone' => $request['phone'],
+//        ]);
+//
+//        return $client->refresh();
+//    }
 }
