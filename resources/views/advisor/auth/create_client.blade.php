@@ -5,7 +5,16 @@
     <div class="setHeight">
         <div class="login-container">
             <h2>Create Client</h2>
+            <div class="position-center">
+                <div class="two-button">
 
+                    <div class="goback2">
+                        <a href="/advisor/clients"> GO BACK</a>
+                    </div>
+
+                </div>
+            </div>
+            <br><br>
             <form action="/advisor/create/client" method="post">
                 @if(session('success'))
                     <div class="alert success">

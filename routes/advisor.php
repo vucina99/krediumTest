@@ -12,6 +12,10 @@ Route::group(['prefix' => 'advisor', 'middleware' => 'auth'], function () {
     Route::get('/create/client', [AdvisorController::class , 'createClient']);
     Route::post('/create/client', [AdvisorController::class , 'createClientSystem']);
     Route::delete('/delete/client/{id}', [AdvisorController::class , 'deleteClient']);
+    Route::get('/edit/client/{id}', [AdvisorController::class , 'showEdit']);
+    Route::patch('/edit/client/{id}', [AdvisorController::class , 'editClient']);
+    Route::patch('/cash/loan/{id}', [AdvisorController::class , 'cashLoan']);
+    Route::patch('/home/loan/{id}', [AdvisorController::class , 'homeLoan']);
 
     Route::post('/logout', [AdvisorController::class , 'logout']);
 

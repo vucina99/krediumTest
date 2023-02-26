@@ -13,7 +13,7 @@ class Client extends Model
         'first_name',
         'last_name',
         'email',
-        'phone',
+        'phone_number',
     ];
 
     public function homeLoan(){
@@ -26,10 +26,10 @@ class Client extends Model
 //    public function create($request){
 //
 //        $client =  Client::create([
-//            'first_name' => $request['first_name'],
+//            'first_name' => $request['first_name'] ,
 //            'last_name' => $request['last_name'],
-//            'email' => $request['email'],
-//            'phone' => $request['phone'],
+//            'email' => $request['email'] ?? null,
+//            'phone_number' => $request['phone'] ?? null,
 //        ]);
 //
 //        return $client->refresh();

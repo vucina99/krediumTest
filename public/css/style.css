@@ -204,6 +204,14 @@ button[type="submit"] {
     padding: 10px;
     text-align: center;
 }
+
+.goback2{
+    background-color:  #ffffff;
+    color: #333333;
+    width: 100%;
+    padding: 5px 100px;
+    text-align: center;
+}
 .create{
      border: 1px solid #333333;
      color: #333333;
@@ -220,6 +228,11 @@ button[type="submit"] {
     text-decoration: none;
     width: 100%;
 }
+.goback2 a{
+    color: #333333;
+    text-decoration: none;
+    width: 100%;
+}
 .create a{
     color: #333333;
     text-decoration: none;
@@ -228,4 +241,7 @@ button[type="submit"] {
 .deleteButton{
     padding: 0px;
     margin: 0px;
+}
+.table a {
+    color : #000;
 }
