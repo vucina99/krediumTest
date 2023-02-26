@@ -70,8 +70,9 @@
                 <label for="value">Loan Amount:</label>
                 <input type="number" id="loan_amount" name="loan_amount" value="{{$client->cashLoan ? $client->cashLoan->loan_amount : 0}}"  placeholder="Loan amount">
 
-
-                <button type="submit">ACCEPT VALUE</button>
+                @if(!$client->cashLoan || ($client->cashLoan && $client->cashLoan->user_id == Auth::user()->id)  )
+                    <button type="submit">ACCEPT VALUE </button>
+                @endif
             </form>
 
             {{--            HOME LOAN--}}
@@ -90,8 +91,9 @@
 
                 <label for="property_value">Property Value:</label>
                 <input type="number" id="property_value" value="{{$client->homeLoan ? $client->homeLoan->property_value : 0}}" name="property_value" placeholder="Property Value">
-
+                @if(!$client->homeLoan || ($client->homeLoan && $client->homeLoan->user_id == Auth::user()->id)  )
                 <button type="submit">ACCEPT VALUE</button>
+                @endif
             </form>
 
 
