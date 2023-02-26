@@ -24,5 +24,14 @@ class AdvisorSeeder extends Seeder
             'updated_at' => Carbon::now(),
             'password' => Hash::make('kredium123')
         ]);
+
+        DB::table('users')->insert([
+            'first_name' => 'Pera',
+            'last_name' => 'Peric',
+            'email' => 'pera@gmail.com',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+            'password' => Hash::make('kredium12345')
+        ]);
     }
 }
