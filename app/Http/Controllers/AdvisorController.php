@@ -28,23 +28,30 @@ class AdvisorController extends Controller
 
     }
 
-    public function home(){
+    public function home()
+    {
         return view("advisor.auth.home");
     }
-    public function clients(){
+
+    public function clients()
+    {
         $clients = Client::all();
-        return view("advisor.auth.clients" , compact('clients'));
+        return view("advisor.auth.clients", compact('clients'));
     }
-    public function logout(){
+
+    public function logout()
+    {
         Auth::logout();
         return redirect('/');
     }
 
-    public function createClient(){
+    public function createClient()
+    {
         return view("advisor.auth.create_client");
     }
 
-    public function createClientSystem(CreateClientRequest $request){
+    public function createClientSystem(CreateClientRequest $request)
+    {
         DB::table('clients')->insert([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -53,17 +60,20 @@ class AdvisorController extends Controller
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
-//        $this->client->create($request);
+        //I have to use the query builder because Eloquent create for client stops working because of my kdebug, I don't know why
+        //        $this->client->create($request);
         $request->session()->flash('success', 'New client has been added successfully.');
 
         return back();
     }
 
-    public function deleteClient($id){
+    public function deleteClient($id)
+    {
         $client = Client::find($id);
-        if(!$client){
+        if (!$client) {
             return redirect('/advisor/clients');
         }
+        //if we delete a client from the database, we also delete all the products it is associated with
         $client->cashLoan()->delete();
         $client->homeLoan()->delete();
         $client->delete();
@@ -73,18 +83,20 @@ class AdvisorController extends Controller
         return redirect('/advisor/clients');
     }
 
-    public function showEdit($id){
+    public function showEdit($id)
+    {
         $client = Client::find($id);
-        if(!$client){
+        if (!$client) {
             return redirect('/advisor/clients');
         }
 
-        return view('advisor.auth.edit_client' , compact('client'));
+        return view('advisor.auth.edit_client', compact('client'));
     }
 
-    public function editClient(CreateClientRequest $request , $id){
+    public function editClient(CreateClientRequest $request, $id)
+    {
         $client = Client::find($id);
-        if(!$client){
+        if (!$client) {
             return redirect('/advisor/clients');
         }
         $client->update([
@@ -97,25 +109,28 @@ class AdvisorController extends Controller
         return back();
     }
 
-    public function cashLoan(  CashLoanRequest $request , $id){
+    public function cashLoan(CashLoanRequest $request, $id)
+    {
+
         $client = Client::find($id);
-        if(!$client){
+        if (!$client) {
             return redirect('/advisor/clients');
         }
 
-        $cashLoan = CashLoan::where('client_id' , $id)->first();
+        $cashLoan = CashLoan::where('client_id', $id)->first();
+        //if isset cashLoan we do update, opposite we do create
 
-        if(!$cashLoan){
+        if (!$cashLoan) {
             CashLoan::create([
                 'client_id' => $id,
                 'user_id' => Auth::user()->id,
                 'loan_amount' => $request->loan_amount
             ]);
-        }else{
-            if($cashLoan->user_id == Auth::user()->id){
+        } else {
+            if ($cashLoan->user_id == Auth::user()->id) {
                 $cashLoan->loan_amount = $request->loan_amount;
                 $cashLoan->save();
-            }else{
+            } else {
                 return redirect('/advisor/clients');
             }
         }
@@ -125,27 +140,28 @@ class AdvisorController extends Controller
     }
 
 
-    public function homeLoan(  HomeLoanRequest $request , $id){
+    public function homeLoan(HomeLoanRequest $request, $id)
+    {
         $client = Client::find($id);
-        if(!$client){
+        if (!$client) {
             return redirect('/advisor/clients');
         }
 
-        $cashLoan = HomeLoan::where('client_id' , $id)->first();
-
-        if(!$cashLoan){
+        $homeLoan = HomeLoan::where('client_id', $id)->first();
+        //if isset $homeLoan we do update, opposite we do create
+        if (!$homeLoan) {
             HomeLoan::create([
                 'client_id' => $id,
                 'user_id' => Auth::user()->id,
                 'down_payment_amount' => $request->down_payment_amount,
                 'property_value' => $request->property_value
             ]);
-        }else{
-            if($cashLoan->user_id == Auth::user()->id){
-                $cashLoan->down_payment_amount = $request->down_payment_amount;
-                $cashLoan->property_value = $request->property_value;
-                $cashLoan->save();
-            }else{
+        } else {
+            if ($homeLoan->user_id == Auth::user()->id) {
+                $homeLoan->down_payment_amount = $request->down_payment_amount;
+                $homeLoan->property_value = $request->property_value;
+                $homeLoan->save();
+            } else {
                 return redirect('/advisor/clients');
             }
 
@@ -155,32 +171,34 @@ class AdvisorController extends Controller
         return back();
     }
 
-    public function reports(){
-        $cahsLoan = CashLoan::select('loan_amount',  DB::raw('null as down_payment_amount') ,  'created_at', 'user_id')
+    public function reports()
+    {
+        //get cashLoan
+        $cahsLoan = CashLoan::select('loan_amount', DB::raw('null as down_payment_amount'), 'created_at', 'user_id')
             ->addSelect(DB::raw("'cash loan' as type"))
             ->where('user_id', Auth::user()->id);
+        //get HomeLoan
         $homeLoan = HomeLoan::select('property_value', 'down_payment_amount', 'created_at', 'user_id')
             ->addSelect(DB::raw("'home loan' as type"))
             ->where('user_id', Auth::user()->id);
+
+        //reports is union two values, because we want one table
         $reports = $cahsLoan->union($homeLoan)->orderBy('created_at', 'desc')->get();
 
-        return view('advisor.auth.reports' , compact('reports'));
+        return view('advisor.auth.reports', compact('reports'));
     }
 
 
+    function exportToXlsx()
+    {
 
-
-
-    function exportToXlsx() {
-
-        $cahsLoan = CashLoan::select('loan_amount',  DB::raw('null as down_payment_amount') ,  'created_at', 'user_id')
+        $cahsLoan = CashLoan::select('loan_amount', DB::raw('null as down_payment_amount'), 'created_at', 'user_id')
             ->addSelect(DB::raw("'cash loan' as type"))
             ->where('user_id', Auth::user()->id);
         $homeLoan = HomeLoan::select('property_value', 'down_payment_amount', 'created_at', 'user_id')
             ->addSelect(DB::raw("'home loan' as type"))
             ->where('user_id', Auth::user()->id);
         $data = $cahsLoan->union($homeLoan)->orderBy('created_at', 'desc')->get();
-
 
 
         // Create new PHPExcel object
@@ -202,16 +220,16 @@ class AdvisorController extends Controller
             ->setCellValue('C1', 'Creation date');
         $row = 2;
         foreach ($data as $value) {
-            if($value->type == 'cash loan'){
+            if ($value->type == 'cash loan') {
                 $objPHPExcel->setActiveSheetIndex(0)
-                    ->setCellValue('A'.$row, $value->type)
-                    ->setCellValue('B'.$row, (string) $value->loan_amount)
-                    ->setCellValue('C'.$row, $value->created_at->format('Y-m-d H:i:s'));
-            }else{
+                    ->setCellValue('A' . $row, $value->type)
+                    ->setCellValue('B' . $row, (string)$value->loan_amount)
+                    ->setCellValue('C' . $row, $value->created_at->format('Y-m-d H:i:s'));
+            } else {
                 $objPHPExcel->setActiveSheetIndex(0)
-                    ->setCellValue('A'.$row, $value->type)
-                    ->setCellValue('B'.$row, $value->loan_amount.' - ' .$value->down_payment_amount )
-                    ->setCellValue('C'.$row, $value->created_at->format('Y-m-d H:i:s'));
+                    ->setCellValue('A' . $row, $value->type)
+                    ->setCellValue('B' . $row, $value->loan_amount . ' - ' . $value->down_payment_amount)
+                    ->setCellValue('C' . $row, $value->created_at->format('Y-m-d H:i:s'));
             }
 
             $row++;

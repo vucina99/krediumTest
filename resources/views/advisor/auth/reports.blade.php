@@ -11,9 +11,9 @@
                         <a href="/"> GO BACK </a>
                     </div>
                     @if(count($reports) > 0)
-                    <div class="create">
-                        <a href="/advisor/export/excel"> EXPORT EXCEL</a>
-                    </div>
+                        <div class="create">
+                            <a href="/advisor/export/excel"> EXPORT EXCEL</a>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -35,7 +35,7 @@
                         <tr>
                             <td>{{$report->type}}</td>
                             @if($report->type == 'cash loan')
-                            <td>{{$report->loan_amount}}</td>
+                                <td>{{$report->loan_amount}}</td>
 
                             @else
                                 <td>{{$report->loan_amount}} - {{$report->down_payment_amount}}</td>

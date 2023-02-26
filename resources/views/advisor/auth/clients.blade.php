@@ -48,7 +48,7 @@
                             <td>{{$client->homeLoan ? 'YES' : 'NO'}}</td>
                             <td class="last-td">
                                 <div><a href="/advisor/edit/client/{{$client->id}}"><i class="fa fa fa-pencil"
-                                                   aria-hidden="true"></i></a></div>
+                                                                                       aria-hidden="true"></i></a></div>
                                 <div>
                                     <form action="/advisor/delete/client/{{$client->id}}" method="post">
                                         @csrf
